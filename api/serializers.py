@@ -1,12 +1,21 @@
+from django.forms.models import model_to_dict
 from rest_framework import serializers
 
 from .models import TopMovies, Movie
 
+class MovieRelatedField(serializers.RelatedField):
+
+    def to_representation(self, value):
+        # return model_to_dict(value)
+        return model_to_dict(value)
+
 class TopMoviesSerializer(serializers.ModelSerializer):
     
+    movie = MovieRelatedField(many=True, read_only=True)
+
     class Meta:
         model = TopMovies
-        fields = ['id']
+        fields = ['id', 'movie']
 
 class MovieSerializer(serializers.ModelSerializer):
 

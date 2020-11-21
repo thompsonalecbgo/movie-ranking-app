@@ -10,7 +10,7 @@ driver = r"D:\PROJECTS\geckodriver\geckodriver.exe"
 
 url = "http://localhost:3000/"
 
-TIME_LIMIT = 10
+TIME_LIMIT = 100
 
 class NewUserTests(LiveServerTestCase):
 
@@ -65,17 +65,19 @@ class NewUserTests(LiveServerTestCase):
         search_results = self.wait_for_element(
             lambda: self.browser.find_element_by_id("search-results")
         )
-        results = self.wait_for_element(
+        search_results = self.wait_for_element(
             lambda: self.browser.find_elements_by_tag_name("li")
         )
-        results_list = [result.text for result in results]
-        self.assertIn("Titanic (1997)", results_list)
-        self.assertLessEqual(len(results_list), 5)
+        results = [result.text for result in search_results]
+        self.assertIn("Titanic (1997)", results)
+        self.assertLessEqual(len(results), 5)
         
         # add movie to list
-        self.browser.find_element_by_link_text("Titanic (1997)").click()
+        result_idx = results.index("Titanic (1997)")
+        target_result = search_results[result_idx].find_element_by_tag_name("div")
+        target_result.click()
         top_movies = self.wait_for_element(
-            lambda: self.browser.find_element_by_id("top-movies")
+            lambda: self.browser.find_element_by_class_name("top-movies")
         )
         top_movies = self.wait_for_element(
             lambda: self.browser.find_elements_by_tag_name("li")

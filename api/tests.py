@@ -32,7 +32,7 @@ class NewTopMoviesTest(TestCase):
             data={
                 'tmdb_id': '123',
                 'title': 'new movie',
-                'release_date': date(2000, 1, 1),
+                'release_date': '2012-04-25',
                 'poster_path': 'https://themoviedb.org/path-to-movie-poster.jpg'
             })
         self.assertEqual(response.status_code, 201)
@@ -52,7 +52,7 @@ class NewTopMovieTest(TestCase):
             data={
                 'tmdb_id': '123',
                 'title': 'new movie',
-                'release_date': date(2000, 1, 1),
+                'release_date': '2012-04-25',
                 'poster_path': 'https://themoviedb.org/path-to-movie-poster.jpg'
             }
         )
