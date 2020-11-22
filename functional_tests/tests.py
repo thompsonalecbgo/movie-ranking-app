@@ -159,9 +159,6 @@ class TopMoviesFeaturesTests(SeleniumTests):
         for i, rank in enumerate(ranks):
             self.assertEqual(int(rank), i+1)
 
-    def test_user_can_delete_movies_in_list(self):
-        pass
-
     def test_user_can_move_movie_rank_up(self):
         self.browser.get(url + f"top-movies/{self.top_movies.id}/")
         top_movies = self.wait_for_element(
@@ -173,10 +170,10 @@ class TopMoviesFeaturesTests(SeleniumTests):
         movies = [movie.text for movie in top_movies]
 
         # move rank of third movie up
-        rank_up_buttons = self.wait_for_element(
+        move_rank_btns = self.wait_for_element(
             lambda: self.browser.find_elements_by_css_selector("#top-movies li .move-rank-up")
         )
-        rank_up_buttons[2].click()
+        move_rank_btns[2].click()
 
         updated_top_movies = self.wait_for_element(
             lambda: self.browser.find_elements_by_css_selector("#top-movies li .movie-detail")
@@ -184,8 +181,61 @@ class TopMoviesFeaturesTests(SeleniumTests):
         updated_movies = [movie.text for movie in updated_top_movies]
 
         self.assertEqual(movies[0], updated_movies[0])
-        self.assertEqual(movies[2], updated_movies[1])
         self.assertEqual(movies[1], updated_movies[2])
+        self.assertEqual(movies[2], updated_movies[1])
         self.assertEqual(movies[3], updated_movies[3])
         self.assertEqual(movies[4], updated_movies[4])
     
+    def test_user_can_move_movie_rank_down(self):
+        self.browser.get(url + f"top-movies/{self.top_movies.id}/")
+        top_movies = self.wait_for_element(
+            lambda: self.browser.find_element_by_id("top-movies")
+        )
+        top_movies = self.wait_for_element(
+            lambda: self.browser.find_elements_by_css_selector("#top-movies li .movie-detail")
+        )
+        movies = [movie.text for movie in top_movies]
+
+        # move rank of third movie up
+        move_rank_btns = self.wait_for_element(
+            lambda: self.browser.find_elements_by_css_selector("#top-movies li .move-rank-down")
+        )
+        move_rank_btns[2].click()
+
+        updated_top_movies = self.wait_for_element(
+            lambda: self.browser.find_elements_by_css_selector("#top-movies li .movie-detail")
+        )
+        updated_movies = [movie.text for movie in updated_top_movies]
+
+        self.assertEqual(movies[0], updated_movies[0])
+        self.assertEqual(movies[1], updated_movies[1])
+        self.assertEqual(movies[2], updated_movies[3])
+        self.assertEqual(movies[3], updated_movies[2])
+        self.assertEqual(movies[4], updated_movies[4])
+
+    def test_user_can_delete_movies_in_list(self):
+        self.browser.get(url + f"top-movies/{self.top_movies.id}/")
+        top_movies = self.wait_for_element(
+            lambda: self.browser.find_element_by_id("top-movies")
+        )
+        top_movies = self.wait_for_element(
+            lambda: self.browser.find_elements_by_css_selector("#top-movies li .movie-detail")
+        )
+        movies = [movie.text for movie in top_movies]
+
+        # move rank of third movie up
+        delete_rank_btns = self.wait_for_element(
+            lambda: self.browser.find_elements_by_css_selector("#top-movies li .delete-rank")
+        )
+        delete_rank_btns[2].click()
+
+        updated_top_movies = self.wait_for_element(
+            lambda: self.browser.find_elements_by_css_selector("#top-movies li .movie-detail")
+        )
+        updated_movies = [movie.text for movie in updated_top_movies]
+
+        self.assertEqual(movies[0], updated_movies[0])
+        self.assertEqual(movies[1], updated_movies[1])
+        self.assertEqual(movies[3], updated_movies[2])
+        self.assertEqual(movies[4], updated_movies[3])
+        self.assertNotIn(movies[2], updated_movies)

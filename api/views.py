@@ -35,11 +35,14 @@ class MovieViewSet(viewsets.ModelViewSet):
     queryset = Movie.objects.all()
     serializer_class = MovieSerializer
 
-    @action(detail=True, methods=["delete"], url_path="delete-rank")
+    @action(detail=True, methods=["put", "delete"], url_path="delete-rank")
     def delete_rank(self, request, pk=None):
         movie = self.get_object()
+        top_movies = movie.top_movies
+        serializer = TopMoviesSerializer(top_movies)
         movie.delete_rank()
-        return Response(status=status.HTTP_204_NO_CONTENT)
+        # return Response(status=status.HTTP_204_NO_CONTENT)
+        return Response(serializer.data)
 
     @action(detail=True, methods=["put"], url_path="move-rank-up")
     def move_rank_up(self, request, pk=None):
