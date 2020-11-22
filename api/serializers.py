@@ -23,7 +23,7 @@ class MovieSerializer(serializers.ModelSerializer):
     class Meta:
         model = Movie
         fields = ['id', 'tmdb_id', 'title', 'release_date',
-                  'poster_path', 'top_movies']
+                  'poster_path', 'top_movies', 'rank']
     
     def create(self, validated_data):
-        return Movie.objects.create(**validated_data)
+        return Movie.objects.create_movie(**validated_data)

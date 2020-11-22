@@ -3,7 +3,7 @@ from rest_framework import routers
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 
-from .views import TopMoviesViewSet
+from .views import TopMoviesViewSet, MovieViewSet
 
 @api_view(['GET'])
 def api_root(request):
@@ -18,7 +18,7 @@ urlpatterns = [
 ]
 
 router = routers.SimpleRouter()
-router.register('top-movies', TopMoviesViewSet, basename="TopMoviesList")
-# router.register('top-movie', TopMoviesViewSet)
+router.register('top-movies', TopMoviesViewSet, basename="TopMovies")
+router.register('top-movie', MovieViewSet, basename="Movie")
 
 urlpatterns += router.urls
