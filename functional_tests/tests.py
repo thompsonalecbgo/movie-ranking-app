@@ -45,91 +45,103 @@ class SeleniumTests(LiveServerTestCase):
                     raise e
                 time.sleep(0.5)
 
-class ConnectionTests(SeleniumTests):
+# class ConnectionTests(SeleniumTests):
 
-    def test_frontend_can_connect_to_backend(self):
-        self.browser.get(url)
-        welcome_message = self.wait_for_element(
-            lambda: self.browser.find_element_by_id("welcome")
-        ).text
-        self.assertIn("Welcome to My Top 100 Movies.", welcome_message)
+#     def test_frontend_can_connect_to_backend(self):
+#         self.browser.get(url)
+#         welcome_message = self.wait_for_element(
+#             lambda: self.browser.find_element_by_id("welcome")
+#         ).text
+#         self.assertIn("Welcome to My Top 100 Movies.", welcome_message)
 
 class NewUserTests(SeleniumTests):
 
+    MOVIE_1 = 'Titanic'
+    RESULT_1 = 'Titanic (1997)'
+    MOVIE_2 = 'Cinderella'
+    RESULT_2 = 'Cinderella (2015)'
+
+    def search_movie_and_click_result(self, movie, result):
+        search_bar = self.browser.find_element_by_id("search-bar")
+        self.assertEqual(
+            search_bar.get_attribute('placeholder'),
+            'Search for your favorite movies!'
+        )
+
+        search_bar.send_keys(movie)
+        search_results = self.wait_for_element(
+            lambda: self.browser.find_element_by_id("search-results")
+        )
+        search_results = self.wait_for_element(
+            lambda: self.browser.find_elements_by_css_selector("#search-results li")
+        )
+        results = [result.text for result in search_results]
+        self.assertIn(result, results)
+
+        result_idx = results.index(result)
+        search_results[result_idx].click()
+
+    def check_if_movie_in_top_movies(self, movies, count):
+        top_movies = self.wait_for_element(
+            lambda: self.browser.find_element_by_id("top-movies")
+        )
+        top_movies = self.wait_for_element(
+            lambda: self.browser.find_elements_by_css_selector("#top-movies li .movie-detail")
+        )
+        top_movies = [movie.text for movie in top_movies]
+        for movie in movies:
+            self.assertIn(movie, top_movies)
+        self.assertEqual(len(movies), count)
+
+    def count_top_movie_lists(self, count):
+        top_movie_lists = self.wait_for_element(
+            lambda: self.browser.find_element_by_id("top-movie-lists")
+        )
+        top_movie_lists = self.wait_for_element(
+            lambda: self.browser.find_elements_by_css_selector("#top-movie-lists .top-movie-list")
+        )
+        self.assertEqual(len(top_movie_lists), count)
+
     def test_user_can_create_top_movies(self):
 
-        # user visits website Search Movie section
-        self.browser.get(url + "search/")
-        self.assertIn('Search Movie', self.browser.title)
+        # user visits website
+        self.browser.get(url)
+        self.assertIn('Top Movies', self.browser.title)
         page_text = self.browser.find_element_by_tag_name("body").text
         self.assertIn("Search Movie", page_text)
 
         # user searches for movie Titanic
         # search results show several options with Titanic in the title
         # user checks if the correct Titanic is in the options
-        movie = 'Titanic'
-        search_bar = self.browser.find_element_by_id("search-bar")
-        self.assertEqual(
-            search_bar.get_attribute('placeholder'),
-            'Search for your favorite movies!'
-        )
-        search_bar.send_keys(movie)
-        search_results = self.wait_for_element(
-            lambda: self.browser.find_element_by_id("search-results")
-        )
-        search_results = self.wait_for_element(
-            lambda: self.browser.find_elements_by_css_selector("#search-results li")
-        )
-        results = [result.text for result in search_results]
-        self.assertIn("Titanic (1997)", results)
-        
         # user selects correct Titanic
         # system creates new list with movie Titanic
-        result_idx = results.index("Titanic (1997)")
-        search_results[result_idx].click()
-        top_movies = self.wait_for_element(
-            lambda: self.browser.find_element_by_id("top-movies")
-        )
-        top_movies = self.wait_for_element(
-            lambda: self.browser.find_elements_by_css_selector("#top-movies li .movie-detail")
-        )
-        movies = [movie.text for movie in top_movies]
-        self.assertIn("Titanic (1997)", movies)
-        self.assertEqual(len(movies), 1)
+        self.search_movie_and_click_result(self.MOVIE_1, self.RESULT_1)
+        self.check_if_movie_in_top_movies([self.RESULT_1,], 1)
 
         # user searches for movie Cinderella
-        movie = 'Cinderella'
-        search_bar = self.browser.find_element_by_id("search-bar")
-        search_bar.send_keys(movie)
-        search_results = self.wait_for_element(
-            lambda: self.browser.find_element_by_id("search-results")
-        )
-        search_results = self.wait_for_element(
-            lambda: self.browser.find_elements_by_css_selector("#search-results li")
-        )
-        results = [result.text for result in search_results]
-        self.assertIn("Cinderella (2015)", results)
-        
         # user selects correct Cinderella
         # system adds the selected movie to existing list
-        result_idx = results.index("Cinderella (2015)")
-        search_results[result_idx].click()
-        top_movies = self.wait_for_element(
-            lambda: self.browser.find_element_by_id("top-movies")
-        )
-        top_movies = self.wait_for_element(
-            lambda: self.browser.find_elements_by_css_selector("#top-movies li .movie-detail")
-        )
-        movies = [movie.text for movie in top_movies]
-        self.assertIn("Titanic (1997)", movies)
-        self.assertIn("Cinderella (2015)", movies)
-        self.assertEqual(len(movies), 2)
+        self.search_movie_and_click_result(self.MOVIE_2, self.RESULT_2)
+        self.check_if_movie_in_top_movies([self.RESULT_1, self.RESULT_2], 2)
 
     def test_user_can_create_multiple_top_movies(self):
-        pass
-    
-    def test_user_cannot_add_same_movie_in_same_top_movies_twice(self):
-        pass
+
+        MOVIE_1 = 'Titanic'
+        RESULT_1 = 'Titanic (1997)'
+        MOVIE_2 = 'Cinderella'
+        RESULT_2 = 'Cinderella (2015)'
+
+        self.browser.get(url)
+        self.search_movie_and_click_result(self.MOVIE_1, RESULT_1)
+        self.check_if_movie_in_top_movies([self.RESULT_1,], 1)
+
+        self.browser.get(url)
+        self.count_top_movie_lists(1)
+        self.search_movie_and_click_result(MOVIE_2, RESULT_2)
+        self.check_if_movie_in_top_movies([self.RESULT_2,], 1)
+
+        self.browser.get(url)
+        self.count_top_movie_lists(2)
 
 class TopMoviesFeaturesTests(SeleniumTests):
 
@@ -239,3 +251,14 @@ class TopMoviesFeaturesTests(SeleniumTests):
         self.assertEqual(movies[3], updated_movies[2])
         self.assertEqual(movies[4], updated_movies[3])
         self.assertNotIn(movies[2], updated_movies)
+
+# TODO:
+
+def test_user_cannot_add_same_movie_in_same_top_movies_twice(self):
+    pass
+
+def test_can_change_top_movie_list_title(self):
+    pass
+
+def test_delete_top_movie_list(self):
+    pass
