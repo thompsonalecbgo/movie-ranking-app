@@ -10,7 +10,7 @@ driver = r"D:\PROJECTS\geckodriver\geckodriver.exe"
 
 url = "http://localhost:3000/"
 
-TIME_LIMIT = 100
+TIME_LIMIT = 10
 
 class NewUserTests(LiveServerTestCase):
 
@@ -47,14 +47,16 @@ class NewUserTests(LiveServerTestCase):
         self.assertIn("Welcome to My Top 100 Movies.", welcome_message)
 
     def test_user_can_create_list(self):
-        self.browser.get(url + "search/")
 
+        # user visits website Search Movie section
+        self.browser.get(url + "search/")
         self.assertIn('Search Movie', self.browser.title)
         page_text = self.browser.find_element_by_tag_name("body").text
         self.assertIn("Search Movie", page_text)
 
-        # find search box
-        # search movie
+        # user searches for movie Titanic
+        # search results show several options with Titanic in the title
+        # user checks if the correct Titanic is in the options
         movie = 'Titanic'
         search_bar = self.browser.find_element_by_id("search-bar")
         self.assertEqual(
@@ -66,30 +68,52 @@ class NewUserTests(LiveServerTestCase):
             lambda: self.browser.find_element_by_id("search-results")
         )
         search_results = self.wait_for_element(
-            lambda: self.browser.find_elements_by_tag_name("li")
+            lambda: self.browser.find_elements_by_css_selector("#search-results li")
         )
         results = [result.text for result in search_results]
         self.assertIn("Titanic (1997)", results)
-        self.assertLessEqual(len(results), 5)
         
-        # add movie to list
+        # user selects correct Titanic
+        # system creates new list with movie Titanic
         result_idx = results.index("Titanic (1997)")
-        target_result = search_results[result_idx].find_element_by_tag_name("div")
-        target_result.click()
+        search_results[result_idx].click()
         top_movies = self.wait_for_element(
-            lambda: self.browser.find_element_by_class_name("top-movies")
+            lambda: self.browser.find_element_by_id("top-movies")
         )
         top_movies = self.wait_for_element(
-            lambda: self.browser.find_elements_by_tag_name("li")
+            lambda: self.browser.find_elements_by_css_selector("#top-movies li")
         )
         movies = [movie.text for movie in top_movies]
         self.assertIn("Titanic (1997)", movies)
         self.assertEqual(len(movies), 1)
 
-        # go to search page?
-        # search_bar.send_keys(Keys.ENTER)
-
-        pass
+        # user searches for movie Cinderella
+        movie = 'Cinderella'
+        search_bar = self.browser.find_element_by_id("search-bar")
+        search_bar.send_keys(movie)
+        search_results = self.wait_for_element(
+            lambda: self.browser.find_element_by_id("search-results")
+        )
+        search_results = self.wait_for_element(
+            lambda: self.browser.find_elements_by_css_selector("#search-results li")
+        )
+        results = [result.text for result in search_results]
+        self.assertIn("Cinderella (2015)", results)
+        
+        # user selects correct Cinderella
+        # system adds the selected movie to existing list
+        result_idx = results.index("Cinderella (2015)")
+        search_results[result_idx].click()
+        top_movies = self.wait_for_element(
+            lambda: self.browser.find_element_by_id("top-movies")
+        )
+        top_movies = self.wait_for_element(
+            lambda: self.browser.find_elements_by_css_selector("#top-movies li")
+        )
+        movies = [movie.text for movie in top_movies]
+        self.assertIn("Titanic (1997)", movies)
+        self.assertIn("Cinderella (2015)", movies)
+        self.assertEqual(len(movies), 2)
 
     def test_user_can_delete_movies_in_list(self):
         pass

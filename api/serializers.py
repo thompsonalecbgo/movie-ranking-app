@@ -6,7 +6,6 @@ from .models import TopMovies, Movie
 class MovieRelatedField(serializers.RelatedField):
 
     def to_representation(self, value):
-        # return model_to_dict(value)
         return model_to_dict(value)
 
 class TopMoviesSerializer(serializers.ModelSerializer):
