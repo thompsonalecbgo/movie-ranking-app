@@ -3,7 +3,8 @@ from django.db.models import Q
 from django.core.validators import MinValueValidator, MaxLengthValidator
 
 class TopMovies(models.Model):
-    pass
+
+    title = models.CharField(max_length=255, blank=True)
 
 class MovieManager(models.Manager):
 

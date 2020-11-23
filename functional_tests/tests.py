@@ -7,6 +7,7 @@ from rest_framework.test import APIClient
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
 from selenium.common.exceptions import WebDriverException, NoSuchElementException
+from selenium.webdriver.common.action_chains import ActionChains
 
 from api.models import TopMovies, Movie
 
@@ -26,6 +27,7 @@ class SeleniumTests(LiveServerTestCase):
     def setUpClass(cls):
         super().setUpClass()
         cls.browser = webdriver.Firefox(executable_path=driver)
+        cls.action_chains = ActionChains(cls.browser)
     
     @classmethod
     def tearDownClass(cls):
@@ -60,6 +62,8 @@ class NewUserTests(SeleniumTests):
     RESULT_1 = 'Titanic (1997)'
     MOVIE_2 = 'Cinderella'
     RESULT_2 = 'Cinderella (2015)'
+    MOVIE_3 = 'Toy Story'
+    RESULT_3 = 'Toy Story (1995)'
 
     def search_movie_and_click_result(self, movie, result):
         search_bar = self.browser.find_element_by_id("search-bar")
@@ -101,6 +105,7 @@ class NewUserTests(SeleniumTests):
             lambda: self.browser.find_elements_by_css_selector("#top-movie-lists .top-movie-list")
         )
         self.assertEqual(len(top_movie_lists), count)
+        return top_movie_lists
 
     def test_user_can_create_top_movies(self):
 
@@ -124,24 +129,46 @@ class NewUserTests(SeleniumTests):
         self.search_movie_and_click_result(self.MOVIE_2, self.RESULT_2)
         self.check_if_movie_in_top_movies([self.RESULT_1, self.RESULT_2], 2)
 
-    def test_user_can_create_multiple_top_movies(self):
+    def test_user_can_create_and_delete_multiple_top_movies(self):
 
-        MOVIE_1 = 'Titanic'
-        RESULT_1 = 'Titanic (1997)'
-        MOVIE_2 = 'Cinderella'
-        RESULT_2 = 'Cinderella (2015)'
-
+        # create multiple top movies
         self.browser.get(url)
-        self.search_movie_and_click_result(self.MOVIE_1, RESULT_1)
+        self.search_movie_and_click_result(self.MOVIE_1, self.RESULT_1)
         self.check_if_movie_in_top_movies([self.RESULT_1,], 1)
 
         self.browser.get(url)
         self.count_top_movie_lists(1)
-        self.search_movie_and_click_result(MOVIE_2, RESULT_2)
+        self.search_movie_and_click_result(self.MOVIE_2, self.RESULT_2)
         self.check_if_movie_in_top_movies([self.RESULT_2,], 1)
 
         self.browser.get(url)
         self.count_top_movie_lists(2)
+        self.search_movie_and_click_result(self.MOVIE_3, self.RESULT_3)
+        self.check_if_movie_in_top_movies([self.RESULT_3,], 1)
+
+        # delete multiple top movies
+        self.browser.get(url)
+        top_movie_lists = self.count_top_movie_lists(3)
+        top_movie_link = top_movie_lists[0].get_attribute("href")
+        self.browser.get(top_movie_link)
+        self.check_if_movie_in_top_movies([self.RESULT_1,], 1)
+        delete_btn = self.wait_for_element(
+            lambda: self.browser.find_element_by_class_name("delete-top-movies")
+        )
+        delete_btn.click()
+
+        self.browser.get(url)
+        top_movie_lists = self.count_top_movie_lists(2)
+        top_movie_link = top_movie_lists[0].get_attribute("href")
+        self.browser.get(top_movie_link)
+        self.check_if_movie_in_top_movies([self.RESULT_2,], 1)
+        delete_btn = self.wait_for_element(
+            lambda: self.browser.find_element_by_class_name("delete-top-movies")
+        )
+        delete_btn.click()
+
+        self.browser.get(url)
+        self.count_top_movie_lists(1)
 
 class TopMoviesFeaturesTests(SeleniumTests):
 
@@ -252,13 +279,42 @@ class TopMoviesFeaturesTests(SeleniumTests):
         self.assertEqual(movies[4], updated_movies[3])
         self.assertNotIn(movies[2], updated_movies)
 
+    def test_can_change_top_movie_list_title(self):
+        title = "Top Movies Title"
+        
+        self.browser.get(url)
+        page_text = self.browser.find_element_by_tag_name("body").text
+        self.assertNotIn(title, page_text)
+
+        self.browser.get(url + f"top-movies/{self.top_movies.id}/")
+        top_movies_title = self.wait_for_element(
+            lambda: self.browser.find_element_by_css_selector(".top-movies-title")
+        )
+        self.action_chains.double_click(top_movies_title).perform()
+        top_movies_title_edit = self.wait_for_element(
+            lambda: self.browser.find_element_by_css_selector(".top-movies-title.edit")
+        )
+        top_movies_title_edit.send_keys(title)
+
+        top_movies = self.wait_for_element(
+            lambda: self.browser.find_element_by_id("top-movies")
+        )
+        top_movies.click()
+        top_movies_title = self.wait_for_element(
+            lambda: self.browser.find_element_by_class_name("top-movies-title")
+        )
+        self.assertEqual(top_movies_title.text, title)
+
+        self.browser.get(url)
+        page_text = self.browser.find_element_by_tag_name("body").text
+        self.assertIn(title, page_text)
+
+
+
 # TODO:
 
 def test_user_cannot_add_same_movie_in_same_top_movies_twice(self):
     pass
 
-def test_can_change_top_movie_list_title(self):
-    pass
-
-def test_delete_top_movie_list(self):
+def test_user_cannot_add_more_than_100_movies(self):
     pass
