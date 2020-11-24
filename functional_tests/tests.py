@@ -56,7 +56,7 @@ class SeleniumTests(LiveServerTestCase):
 #         ).text
 #         self.assertIn("Welcome to My Top 100 Movies.", welcome_message)
 
-class NewUserTests(SeleniumTests):
+class TestUserCreatingTopMovies(SeleniumTests):
 
     MOVIE_1 = 'Titanic'
     RESULT_1 = 'Titanic (1997)'
@@ -170,7 +170,7 @@ class NewUserTests(SeleniumTests):
         self.browser.get(url)
         self.count_top_movie_lists(1)
 
-class TopMoviesFeaturesTests(SeleniumTests):
+class TestUserEditingMovies(SeleniumTests):
 
     def setUp(self):
         self.top_movies = TopMovies.objects.create()
@@ -308,7 +308,6 @@ class TopMoviesFeaturesTests(SeleniumTests):
         self.browser.get(url)
         page_text = self.browser.find_element_by_tag_name("body").text
         self.assertIn(title, page_text)
-
 
 
 # TODO:

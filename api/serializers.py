@@ -3,6 +3,10 @@ from rest_framework import serializers
 
 from .models import TopMovies, Movie
 
+# def restrict_amount(value):
+#     if Movie.objects.filter(top_movies=value).count() >= 5:
+#         raise ValidationError('Max number of movies already')
+
 class MovieRelatedField(serializers.RelatedField):
 
     def to_representation(self, value):
