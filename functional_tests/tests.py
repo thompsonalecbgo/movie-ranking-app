@@ -77,7 +77,7 @@ class TestUserCreatingTopMovies(SeleniumTests):
             lambda: self.browser.find_element_by_id("search-results")
         )
         search_results = self.wait_for_element(
-            lambda: self.browser.find_elements_by_css_selector("#search-results li")
+            lambda: self.browser.find_elements_by_class_name("search-result")
         )
         results = [result.text for result in search_results]
         self.assertIn(result, results)
@@ -90,7 +90,7 @@ class TestUserCreatingTopMovies(SeleniumTests):
             lambda: self.browser.find_element_by_id("top-movies")
         )
         top_movies = self.wait_for_element(
-            lambda: self.browser.find_elements_by_css_selector("#top-movies li .movie-detail")
+            lambda: self.browser.find_elements_by_css_selector(".movie-title")
         )
         top_movies = [movie.text for movie in top_movies]
         for movie in movies:
@@ -149,9 +149,6 @@ class TestUserCreatingTopMovies(SeleniumTests):
         # delete multiple top movies
         self.browser.get(url)
         top_movie_lists = self.count_top_movie_lists(3)
-        top_movie_link = top_movie_lists[0].get_attribute("href")
-        self.browser.get(top_movie_link)
-        self.check_if_movie_in_top_movies([self.RESULT_1,], 1)
         delete_btn = self.wait_for_element(
             lambda: self.browser.find_element_by_class_name("delete-top-movies")
         )
@@ -159,9 +156,6 @@ class TestUserCreatingTopMovies(SeleniumTests):
 
         self.browser.get(url)
         top_movie_lists = self.count_top_movie_lists(2)
-        top_movie_link = top_movie_lists[0].get_attribute("href")
-        self.browser.get(top_movie_link)
-        self.check_if_movie_in_top_movies([self.RESULT_2,], 1)
         delete_btn = self.wait_for_element(
             lambda: self.browser.find_element_by_class_name("delete-top-movies")
         )
@@ -185,14 +179,14 @@ class TestUserEditingMovies(SeleniumTests):
             lambda: self.browser.find_element_by_id("top-movies")
         )
         top_movies = self.wait_for_element(
-            lambda: self.browser.find_elements_by_css_selector("#top-movies li .movie-detail")
+            lambda: self.browser.find_elements_by_css_selector(".movie-title")
         )
         movies = [movie.text for movie in top_movies]
         for i, movie in enumerate(self.movies):
             year = datetime.strptime(movie.release_date, "%Y-%m-%d").year
             self.assertEqual(f"{movie.title} ({year})", movies[i])
         movie_ranks = self.wait_for_element(
-            lambda: self.browser.find_elements_by_css_selector("#top-movies li .movie-rank")
+            lambda: self.browser.find_elements_by_css_selector(".movie-rank")
         )
         ranks = [rank.text for rank in movie_ranks]
         for i, rank in enumerate(ranks):
@@ -204,18 +198,18 @@ class TestUserEditingMovies(SeleniumTests):
             lambda: self.browser.find_element_by_id("top-movies")
         )
         top_movies = self.wait_for_element(
-            lambda: self.browser.find_elements_by_css_selector("#top-movies li .movie-detail")
+            lambda: self.browser.find_elements_by_css_selector(".movie-title")
         )
         movies = [movie.text for movie in top_movies]
 
         # move rank of third movie up
         move_rank_btns = self.wait_for_element(
-            lambda: self.browser.find_elements_by_css_selector("#top-movies li .move-rank-up")
+            lambda: self.browser.find_elements_by_css_selector(".move-rank-up")
         )
         move_rank_btns[2].click()
 
         updated_top_movies = self.wait_for_element(
-            lambda: self.browser.find_elements_by_css_selector("#top-movies li .movie-detail")
+            lambda: self.browser.find_elements_by_css_selector(".movie-title")
         )
         updated_movies = [movie.text for movie in updated_top_movies]
 
@@ -231,18 +225,18 @@ class TestUserEditingMovies(SeleniumTests):
             lambda: self.browser.find_element_by_id("top-movies")
         )
         top_movies = self.wait_for_element(
-            lambda: self.browser.find_elements_by_css_selector("#top-movies li .movie-detail")
+            lambda: self.browser.find_elements_by_css_selector(".movie-title")
         )
         movies = [movie.text for movie in top_movies]
 
         # move rank of third movie up
         move_rank_btns = self.wait_for_element(
-            lambda: self.browser.find_elements_by_css_selector("#top-movies li .move-rank-down")
+            lambda: self.browser.find_elements_by_css_selector(".move-rank-down")
         )
         move_rank_btns[2].click()
 
         updated_top_movies = self.wait_for_element(
-            lambda: self.browser.find_elements_by_css_selector("#top-movies li .movie-detail")
+            lambda: self.browser.find_elements_by_css_selector(".movie-title")
         )
         updated_movies = [movie.text for movie in updated_top_movies]
 
@@ -258,18 +252,18 @@ class TestUserEditingMovies(SeleniumTests):
             lambda: self.browser.find_element_by_id("top-movies")
         )
         top_movies = self.wait_for_element(
-            lambda: self.browser.find_elements_by_css_selector("#top-movies li .movie-detail")
+            lambda: self.browser.find_elements_by_css_selector(".movie-title")
         )
         movies = [movie.text for movie in top_movies]
 
         # move rank of third movie up
         delete_rank_btns = self.wait_for_element(
-            lambda: self.browser.find_elements_by_css_selector("#top-movies li .delete-rank")
+            lambda: self.browser.find_elements_by_css_selector(".delete-rank")
         )
         delete_rank_btns[2].click()
 
         updated_top_movies = self.wait_for_element(
-            lambda: self.browser.find_elements_by_css_selector("#top-movies li .movie-detail")
+            lambda: self.browser.find_elements_by_css_selector(".movie-title")
         )
         updated_movies = [movie.text for movie in updated_top_movies]
 
