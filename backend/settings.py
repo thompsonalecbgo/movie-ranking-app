@@ -27,7 +27,7 @@ SECRET_KEY = ')0cu%s%i3ptb_$%ou)*ha4)gruf^4=()$2#wma+5_aq5mri^5e'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
 
-ALLOWED_HOSTS = ['127.0.0.1', '.herokuapp.com', '.csb.app']
+ALLOWED_HOSTS = ['127.0.0.1', '.herokuapp.com', '.csb.app', 'csb-b3fps-nz534sdxh.vercel.app']
 
 
 # Application definition
