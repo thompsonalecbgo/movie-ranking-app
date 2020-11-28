@@ -141,7 +141,7 @@ AUTH_USER_MODEL = "users.CustomUser"
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:8080",
     "http://localhost:3000",
-    "https://csb-b3fps-nz534sdxh.vercel.app/",
+    "https://csb-b3fps-nz534sdxh.vercel.app",
 ]
 
 REST_FRAMEWORK = {
