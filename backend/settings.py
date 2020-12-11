@@ -144,6 +144,7 @@ CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",
     "https://csb-b3fps.vercel.app",
     "https://csb-b3fps-nz534sdxh.vercel.app",
+    "https://movie-ranking-app-frontend.vercel.app",
 ]
 
 REST_FRAMEWORK = {
